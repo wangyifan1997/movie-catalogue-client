@@ -35,6 +35,9 @@
         <b-button type="reset" variant="danger" id="reset">Reset</b-button>
       </b-form>
     </div>
+    <div v-if="showError">
+      <p id="errorText">{{ errorMessage }}</p>
+    </div>
     <div id="insertTable">
       <b-table striped hover :items="movies"></b-table>
     </div>
@@ -43,35 +46,48 @@
 
 
 <script>
+import { getMovies, createMovie } from "../controllers/MovieController";
+
 export default {
   name: "InsertOperationComponent",
   data() {
     return {
-      movies: [
-        {
-          id: 0,
-          name: "Captain America: The First Avenger",
-          revenue: 370000000,
-        },
-      ],
+      movies: [],
       form: {
         id: 0,
         name: "",
         revenue: 0,
       },
       show: true,
+      showError: false,
+      errorMessage: "",
     };
   },
-  created() {
-    this.form.id = this.movies.length;
+  async created() {
+    const response = await getMovies();
+    if (response.isSuccess) {
+      this.movies = response.data;
+    } else {
+      this.errorMessage = response.reason;
+      this.showError = true;
+    }
   },
   methods: {
-    onSubmit(event) {
+    async onSubmit(event) {
       event.preventDefault();
-      this.movies = [
-        ...this.movies,
-        { id: this.form.id, name: this.form.name, revenue: this.form.revenue },
-      ];
+      this.showError = false;
+      const payload = {
+        id: this.form.id,
+        name: this.form.name,
+        revenue: this.form.revenue,
+      };
+      const response = await createMovie(payload);
+      if (response.isSuccess) {
+        this.movies = [...this.movies, payload];
+      } else {
+        this.errorMessage = response.reason;
+        this.showError = true;
+      }
     },
     onReset(event) {
       event.preventDefault();
@@ -98,5 +114,8 @@ export default {
   float: right;
   margin-right: 10px;
   margin-bottom: 10px;
+}
+#errorText {
+  color: #ff0033;
 }
 </style>

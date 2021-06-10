@@ -1,0 +1,75 @@
+<template>
+  <div>
+    <div id="deleteForm">
+      <b-form @submit="onSubmit" v-if="show">
+        <b-form-group id="input-group-1" label="ID:" label-for="input-1">
+          <b-form-input
+            id="input-1"
+            v-model="form.id"
+            type="number"
+            placeholder="Enter ID of the movie you want to delete"
+            required
+          ></b-form-input>
+        </b-form-group>
+        <b-button type="submit" variant="primary" id="submit">Submit</b-button>
+      </b-form>
+    </div>
+    <div v-if="showError">
+      <p id="errorText">{{ errorMessage }}</p>
+    </div>
+    <div id="deleteTable">
+      <b-table striped hover :items="movies"></b-table>
+    </div>
+  </div>
+</template>
+
+<script>
+import { getMovies, deleteMovie } from "../controllers/MovieController";
+
+export default {
+  name: "DeleteOperationComponent",
+  data() {
+    return {
+      movies: [],
+      form: {
+        id: 0,
+      },
+      show: true,
+      showError: false,
+      errorMessage: "",
+    };
+  },
+  async created() {
+    const response = await getMovies();
+    if (response.isSuccess) {
+      this.movies = response.data;
+    } else {
+      this.errorMessage = response.reason;
+      this.showError = true;
+    }
+  },
+  methods: {
+    async onSubmit(event) {
+      event.preventDefault();
+      this.showError = false;
+      const response = await deleteMovie(this.form.id);
+      if (response.isSuccess) {
+        this.movies = this.movies.filter((movie) => (movie.id !== this.form.id))
+      } else {
+        this.errorMessage = response.reason;
+        this.showError = true;
+      }
+    },
+  },
+};
+</script>
+
+<style scoped>
+#submit {
+  float: right;
+  margin-bottom: 10px;
+}
+#errorText {
+  color: #ff0033;
+}
+</style>
