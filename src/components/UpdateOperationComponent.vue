@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div id="insertForm">
+    <div id="updateForm">
       <b-form @submit="onSubmit" @reset="onReset" v-if="show">
         <b-form-group id="input-group-1" label="ID:" label-for="input-1">
           <b-form-input
             id="input-1"
             v-model="form.id"
             type="number"
-            placeholder="Enter ID"
+            placeholder="Enter the ID of the movie you want to modify"
             required
           ></b-form-input>
         </b-form-group>
@@ -16,7 +16,7 @@
           <b-form-input
             id="input-2"
             v-model="form.name"
-            placeholder="Enter the name of the movie"
+            placeholder="Enter the new name of the movie"
             required
           ></b-form-input>
         </b-form-group>
@@ -26,7 +26,7 @@
             id="input-3"
             v-model="form.revenue"
             type="number"
-            placeholder="Enter the revenue of the movie"
+            placeholder="Enter the new revenue of the movie"
             required
           ></b-form-input>
         </b-form-group>
@@ -46,8 +46,8 @@
 
 
 <script>
-import { getMovies, createMovie } from "../controllers/MovieController";
-import { displayError, hideError } from "../utils/Helpers";
+import { getMovies, updateMovie } from "../controllers/MovieController";
+import { displayError, hideError } from '../utils/Helpers';
 
 export default {
   name: "InsertOperationComponent",
@@ -69,15 +69,13 @@ export default {
     if (response.isSuccess) {
       this.movies = response.data;
     } else {
-      this.errorMessage = response.reason;
-      this.showError = true;
+      displayError(this, response.reason);
     }
   },
   methods: {
     async onSubmit(event) {
       event.preventDefault();
-      hideError(this);
-      
+
       const id = parseInt(this.form.id);
       const revenue = parseFloat(this.form.revenue)
       if (isNaN(id)) {
@@ -88,23 +86,23 @@ export default {
         displayError(this, 'revenue is not a number');
         return;
       }
-      
-      if (this.movies.findIndex((movie) => parseInt(movie.id) === id) !== -1) {
-        displayError(this, 'id already exist in table');
+
+      if (this.movies.findIndex((movie) => parseInt(movie.id) === id) === -1) {
+        displayError(this, 'id does not exist in table')
         return;
       }
-      
+      hideError(this);
+
       const payload = {
         id,
         name: this.form.name,
         revenue,
       };
-      const response = await createMovie(payload);
+      const response = await updateMovie(payload);
       if (response.isSuccess) {
         this.movies = [...this.movies, response.data];
       } else {
-        this.errorMessage = response.reason;
-        this.showError = true;
+        displayError(this, response.reason);
       }
     },
     onReset(event) {

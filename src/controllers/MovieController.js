@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { apiUrl } from '../utils/constants'
+import { apiUrl } from '../utils/Constants'
 
 export const getMovies = async (fields, name) => {
     try {

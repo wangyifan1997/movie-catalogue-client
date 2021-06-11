@@ -1,15 +1,13 @@
 <template>
   <div>
-    <div id="deleteForm">
+    <div id="projectionForm">
       <b-form @submit="onSubmit" v-if="show">
-        <b-form-group id="input-group-1" label="ID:" label-for="input-1">
-          <b-form-input
-            id="input-1"
-            v-model="form.id"
-            type="number"
-            placeholder="Enter ID of the movie you want to delete"
-            required
-          ></b-form-input>
+        <b-form-group label="Select the columns:">
+          <b-form-checkbox-group
+            id="checkbox-group-1"
+            v-model="selected"
+            :options="options"
+          ></b-form-checkbox-group>
         </b-form-group>
         <b-button type="submit" variant="primary" id="submit">Submit</b-button>
       </b-form>
@@ -17,24 +15,27 @@
     <div v-if="showError">
       <p id="errorText">{{ errorMessage }}</p>
     </div>
-    <div id="deleteTable">
+    <div id="selectionTable">
       <b-table striped hover :items="movies"></b-table>
     </div>
   </div>
 </template>
 
 <script>
-import { getMovies, deleteMovie } from "../controllers/MovieController";
+import { getMovies } from "../controllers/MovieController";
 import { displayError, hideError } from "../utils/Helpers";
 
 export default {
-  name: "DeleteOperationComponent",
+  name: "ProjectionOperationComponent",
   data() {
     return {
       movies: [],
-      form: {
-        id: 0,
-      },
+      selected: [],
+      options: [
+        { text: "ID", value: "id" },
+        { text: "Name", value: "name" },
+        { text: "Revenue", value: "revenue" },
+      ],
       show: true,
       showError: false,
       errorMessage: "",
@@ -51,17 +52,14 @@ export default {
   methods: {
     async onSubmit(event) {
       event.preventDefault();
-      hideError(this);
-
-      const id = parseInt(this.form.id);
-      if (isNaN(id)) {
-        displayError("id is not a number");
+      if (this.selected.length === 0) {
+        displayError(this, 'You have to select at least one column');
         return;
       }
-
-      const response = await deleteMovie(parseInt(this.form.id));
+      hideError(this);
+      const response = await getMovies(this.selected);
       if (response.isSuccess) {
-        this.movies = this.movies.filter((movie) => parseInt(movie.id) !== id);
+        this.movies = response.data;
       } else {
         displayError(this, response.reason);
       }

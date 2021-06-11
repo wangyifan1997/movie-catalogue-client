@@ -6,7 +6,7 @@
           <b-form-input
             id="input-1"
             v-model="form.name"
-            type="number"
+            type="text"
             placeholder="Display movie with this name"
             required
           ></b-form-input>
@@ -25,6 +25,7 @@
 
 <script>
 import { getMovies } from "../controllers/MovieController";
+import { displayError, hideError } from "../utils/Helpers";
 
 export default {
   name: "SelectionOperationComponent",
@@ -44,20 +45,18 @@ export default {
     if (response.isSuccess) {
       this.movies = response.data;
     } else {
-      this.errorMessage = response.reason;
-      this.showError = true;
+      displayError(this, response.reason);
     }
   },
   methods: {
     async onSubmit(event) {
       event.preventDefault();
-      this.showError = false;
+      hideError(this);
       const response = await getMovies(null, this.form.name);
       if (response.isSuccess) {
         this.movies = response.data;
       } else {
-        this.errorMessage = response.reason;
-        this.showError = true;
+        displayError(this, response.reason);
       }
     },
   },
