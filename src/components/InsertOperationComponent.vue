@@ -77,13 +77,13 @@ export default {
       event.preventDefault();
       this.showError = false;
       const payload = {
-        id: this.form.id,
+        id: parseInt(this.form.id),
         name: this.form.name,
-        revenue: this.form.revenue,
+        revenue: parseFloat(this.form.revenue),
       };
       const response = await createMovie(payload);
       if (response.isSuccess) {
-        this.movies = [...this.movies, payload];
+        this.movies = [...this.movies, response.data];
       } else {
         this.errorMessage = response.reason;
         this.showError = true;

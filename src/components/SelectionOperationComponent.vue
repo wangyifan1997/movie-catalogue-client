@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div id="deleteForm">
+    <div id="selectionForm">
       <b-form @submit="onSubmit" v-if="show">
-        <b-form-group id="input-group-1" label="ID:" label-for="input-1">
+        <b-form-group id="input-group-1" label="Name:" label-for="input-1">
           <b-form-input
             id="input-1"
-            v-model="form.id"
+            v-model="form.name"
             type="number"
-            placeholder="Enter ID of the movie you want to delete"
+            placeholder="Display movie with this name"
             required
           ></b-form-input>
         </b-form-group>
@@ -17,22 +17,22 @@
     <div v-if="showError">
       <p id="errorText">{{ errorMessage }}</p>
     </div>
-    <div id="deleteTable">
+    <div id="selectionTable">
       <b-table striped hover :items="movies"></b-table>
     </div>
   </div>
 </template>
 
 <script>
-import { getMovies, deleteMovie } from "../controllers/MovieController";
+import { getMovies } from "../controllers/MovieController";
 
 export default {
-  name: "DeleteOperationComponent",
+  name: "SelectionOperationComponent",
   data() {
     return {
       movies: [],
       form: {
-        id: 0,
+        name: "",
       },
       show: true,
       showError: false,
@@ -52,9 +52,9 @@ export default {
     async onSubmit(event) {
       event.preventDefault();
       this.showError = false;
-      const response = await deleteMovie(parseInt(this.form.id));
+      const response = await getMovies(null, this.form.name);
       if (response.isSuccess) {
-        this.movies = this.movies.filter((movie) => (movie.id !== this.form.id))
+        this.movies = response.data;
       } else {
         this.errorMessage = response.reason;
         this.showError = true;
