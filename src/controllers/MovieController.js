@@ -13,17 +13,17 @@ export const getMovies = async (fields, name) => {
     }
 }
 
-export const createMovie = async (payload) => {
+export const createMovie = async (params) => {
     try {
-        return await axios.post(`${apiUrl}/movies`, payload)
+        return await axios.post(`${apiUrl}/movies`, null, { params })
     } catch (error) {
         console.error(error.message)
     }
 }
 
-export const updateMovie = async (id, payload) => {
+export const updateMovie = async (id, params) => {
     try {
-        return await axios.put(`${apiUrl}/movies/${id}`, payload)
+        return await axios.put(`${apiUrl}/movies/${id}`,null ,{ params })
     } catch (error) {
         console.error(error.message)
     }

@@ -32,9 +32,7 @@ export default {
   data() {
     return {
       movies: [],
-      form: {
-        id: 0,
-      },
+      form: {},
       show: true,
       showError: false,
       errorMessage: "",
@@ -51,11 +49,17 @@ export default {
   methods: {
     async onSubmit(event) {
       event.preventDefault();
+
       hideError(this);
 
       const id = parseInt(this.form.id);
       if (isNaN(id)) {
         displayError("id is not a number");
+        return;
+      }
+
+      if (this.movies.findIndex((movie) => parseInt(movie.id) === id) === -1) {
+        displayError(this, 'id does not exist in table')
         return;
       }
 

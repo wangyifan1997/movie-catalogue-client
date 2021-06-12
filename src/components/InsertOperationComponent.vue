@@ -54,11 +54,7 @@ export default {
   data() {
     return {
       movies: [],
-      form: {
-        id: 0,
-        name: "",
-        revenue: 0,
-      },
+      form: {},
       show: true,
       showError: false,
       errorMessage: "",
@@ -77,7 +73,7 @@ export default {
     async onSubmit(event) {
       event.preventDefault();
       hideError(this);
-      
+
       const id = parseInt(this.form.id);
       const revenue = parseFloat(this.form.revenue)
       if (isNaN(id)) {
@@ -88,20 +84,25 @@ export default {
         displayError(this, 'revenue is not a number');
         return;
       }
+
+      if (id === 0 || revenue == 0) {
+        displayError(this, 'id or revenue cannot be 0');
+        return;
+      }
       
       if (this.movies.findIndex((movie) => parseInt(movie.id) === id) !== -1) {
         displayError(this, 'id already exist in table');
         return;
       }
       
-      const payload = {
+      const params = {
         id,
         name: this.form.name,
         revenue,
       };
-      const response = await createMovie(payload);
+      const response = await createMovie(params);
       if (response.isSuccess) {
-        this.movies = [...this.movies, response.data];
+        this.movies = [...this.movies, params];
       } else {
         this.errorMessage = response.reason;
         this.showError = true;
