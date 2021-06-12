@@ -54,11 +54,7 @@ export default {
   data() {
     return {
       movies: [],
-      form: {
-        id: 0,
-        name: "",
-        revenue: 0,
-      },
+      form: {},
       show: true,
       showError: false,
       errorMessage: "",
@@ -93,14 +89,19 @@ export default {
       }
       hideError(this);
 
-      const payload = {
+      const params = {
         id,
         name: this.form.name,
         revenue,
       };
-      const response = await updateMovie(payload);
+      const response = await updateMovie(id, params);
       if (response.isSuccess) {
-        this.movies = [...this.movies, response.data];
+        const index = this.movies.findIndex((movie) => parseInt(movie.id) === id);
+        const newMovies = this.movies.map((movie) => {
+          return {...movie};
+        });
+        newMovies[index] = params;
+        this.movies = newMovies;
       } else {
         displayError(this, response.reason);
       }

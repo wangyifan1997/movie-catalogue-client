@@ -62,7 +62,7 @@ export default {
         this.movies = response.data.map((movie) => {
           const movieData = {};
           Object.entries(movie).forEach(([k, v]) => {
-            if (v !== null) movieData[k] = v;
+            if (v !== null && v !== 0) movieData[k] = v;
           })
           return movieData;
         });
