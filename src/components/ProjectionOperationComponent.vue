@@ -59,7 +59,13 @@ export default {
       hideError(this);
       const response = await getMovies(this.selected);
       if (response.isSuccess) {
-        this.movies = response.data;
+        this.movies = response.data.map((movie) => {
+          const movieData = {};
+          Object.entries(movie).forEach(([k, v]) => {
+            if (v !== null) movieData[k] = v;
+          })
+          return movieData;
+        });
       } else {
         displayError(this, response.reason);
       }
