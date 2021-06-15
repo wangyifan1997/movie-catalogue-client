@@ -37,3 +37,19 @@ export const deleteMovie = async (id) => {
     }
 }
 
+export const getMovieJoin = async () => {
+    try {
+        return await axios.get(`${apiUrl}/movies/join`)
+    } catch (error) {
+        console.error(error.message)
+    }
+}
+
+export const getNumMovie = async () => {
+    try {
+        return await axios.get(`${apiUrl}/movies/rownum`)
+    } catch (error) {
+        console.error(error.message)
+    }
+}
+
